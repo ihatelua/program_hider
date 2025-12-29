@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Window Hider 설정</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f7;
+      color: #222;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .section {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .hotkey-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #555;
+      min-width: 120px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+    }
+
+    button {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button.primary {
+      background: #0d6efd;
+      color: white;
+      border-color: #0d6efd;
+    }
+
+    button.primary:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    button + button {
+      margin-left: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead {
+      background: #f0f0f3;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th.checkbox-col,
+    td.checkbox-col {
+      width: 32px;
+      text-align: center;
+    }
+
+    th.icon-col,
+    td.icon-col {
+      width: 36px;
+      text-align: center;
+    }
+
+    .icon-img {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+    }
+
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    .title-cell {
+      font-weight: 500;
+    }
+
+    .path-cell {
+      color: #777;
+      font-family: "Consolas", "Menlo", monospace;
+      font-size: 11px;
+      word-break: break-all;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    .status.ok {
+      color: #198754;
+    }
+    .status.error {
+      color: #dc3545;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e0f2ff;
+      color: #0b5ed7;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Window Hider</h1>
+
+  <div class="section">
+    <div class="section-title">단축키 설정</div>
+    <div class="hotkey-row">
+      <label for="hideHotkey">숨기기 단축키</label>
+      <input id="hideHotkey" type="text" placeholder="Control+Alt+F 처럼, 키를 눌러서 설정하세요">
+    </div>
+    <div class="hotkey-row">
+      <label for="showHotkey">복원 단축키</label>
+      <input id="showHotkey" type="text" placeholder="Control+Alt+G 처럼, 키를 눌러서 설정하세요">
+    </div>
+    <div class="hint">
+      입력 칸을 클릭한 후 원하는 조합(예: Ctrl + Alt + F)을 실제로 누르면 자동으로 설정됩니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      숨길 창 선택
+      <span class="pill">현재 작업 표시줄에 떠 있는 창</span>
+    </div>
+    <div style="margin-bottom: 8px;">
+      <button id="refreshBtn">목록 새로고침</button>
+      <button id="selectAllBtn">전체 선택</button>
+      <button id="clearSelectionBtn">선택 해제</button>
+    </div>
+    <div style="max-height: 380px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+      <table>
+        <thead>
+          <tr>
+            <th class="checkbox-col"></th>
+            <th class="icon-col">아이콘</th>
+            <th>제목</th>
+            <th>실행 파일 경로</th>
+          </tr>
+        </thead>
+        <tbody id="windowTableBody">
+          <!-- JS로 채움 -->
+        </tbody>
+      </table>
+    </div>
+    <div class="hint">
+      숨기기 단축키를 누르면 여기서 체크한 창 전체를 숨기고, 복원 단축키를 누르면 다시 보이게 합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">목록에서 제외할 창 (경로/이름)</div>
+    <div>
+      <textarea id="excludePaths"
+        style="width:100%;height:60px;resize:vertical;border-radius:8px;border:1px solid #ccc;padding:8px;font-size:12px;font-family:Consolas,'Courier New',monospace;"></textarea>
+    </div>
+    <div class="hint">
+      한 줄에 하나씩 입력합니다. 경로에 이 문자열이 <b>포함된</b> 창은 목록에서 보이지 않습니다.<br>
+      예) <code>SearchApp.exe</code> 또는
+      <code>C:\Windows\SystemApps\Microsoft.Windows.Search_cw5n1h2txyewy\SearchApp.exe</code>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="actions">
+      <div>
+        <button class="primary" id="saveBtn">설정 저장</button>
+      </div>
+      <div>
+        <button id="hideNowBtn">지금 숨기기</button>
+        <button id="showNowBtn">지금 복원</button>
+      </div>
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

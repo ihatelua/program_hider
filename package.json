@@ -1,0 +1,19 @@
+{
+  "name": "window-hider",
+  "version": "1.0.0",
+  "description": "Check windows and hide/show them with configurable hotkeys",
+  "main": "main.js",
+  "build": {
+    "appId": "com.windowhider.app",
+    "win": {
+      "icon": "assets/app.ico"
+    }
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^33.0.0",
+    "node-window-manager": "^2.2.4"
+  }
+}
